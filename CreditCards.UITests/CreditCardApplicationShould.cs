@@ -1,152 +1,138 @@
 ﻿using System;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
+using CreditCards.UITests.PageObjectModels;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace CreditCards.UITests
 {
     [Trait("Category", "Applications")]
-    public class CreditCardApplicationShould
-    {
-        private const string HomeUrl = "http://localhost:44108/";
-        private const string ApplyUrl = "http://localhost:44108/Apply";
+    public class CreditCardApplicationShould : IClassFixture<ChromeDriverFixture>
+    {                
+        private readonly ChromeDriverFixture ChromeDriverFixture;
 
-        private readonly ITestOutputHelper output;
-
-        public CreditCardApplicationShould(ITestOutputHelper output)
+        public CreditCardApplicationShould(ChromeDriverFixture chromeDriverFixture)
         {
-            this.output = output;
+            ChromeDriverFixture = chromeDriverFixture;
+            ChromeDriverFixture.Driver.Manage().Cookies.DeleteAllCookies();
+            ChromeDriverFixture.Driver.Navigate().GoToUrl("about:blank");
         }
 
         [Fact]
         public void BeInitiatedFromHomePage_NewLowRate()
         {
-            using (IWebDriver driver = new ChromeDriver())
-            {
-                driver.Navigate().GoToUrl(HomeUrl);
-                DemoHelper.Pause();
+            var homePage = new HomePage(ChromeDriverFixture.Driver);
+            homePage.NavigateTo();
 
-                IWebElement applyLink = driver.FindElement(By.Name("ApplyLowRate"));
-                applyLink.Click();
+            ApplicationPage applicationPage = homePage.ClickApplyLowRateLink();
 
-                DemoHelper.Pause();
-
-                Assert.Equal("Credit Card Application - Credit Cards", driver.Title);
-                Assert.Equal(ApplyUrl, driver.Url);
-            }
+            applicationPage.EnsurePageLoaded();
         }
 
         [Fact]
         public void BeInitiatedFromHomePage_EasyApplication()
         {
-            using (IWebDriver driver = new ChromeDriver())
-            {
-                driver.Navigate().GoToUrl(HomeUrl);
-                DemoHelper.Pause();
+            var homePage = new HomePage(ChromeDriverFixture.Driver);
+            homePage.NavigateTo();
 
-                IWebElement carouselNext =
-                    driver.FindElement(By.CssSelector("[data-slide='next']"));
-                carouselNext.Click();
+            homePage.WaitForEasyApplicationCarouselPage();
 
-                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(1));
-                IWebElement applyLink =
-                    wait.Until((d) => d.FindElement(By.LinkText("Easy: Apply Now!")));
-                applyLink.Click();
+            ApplicationPage applicationPage = homePage.ClickApplyEasyApplicationLink();
 
-                //IWebElement applyLink = driver.FindElement(By.LinkText("Easy: Apply Now!"));
-                //applyLink.Click();
-
-                DemoHelper.Pause();
-
-                Assert.Equal("Credit Card Application - Credit Cards", driver.Title);
-                Assert.Equal(ApplyUrl, driver.Url);
-            }
+            applicationPage.EnsurePageLoaded();
         }
-
-        //[Fact]
-        //public void BeInitiatedFromHomePage_EasyApplication_Prebuilt_Conditions()
-        //{
-        //    using (IWebDriver driver = new ChromeDriver())
-        //    {
-        //        driver.Navigate().GoToUrl(HomeUrl);
-        //        DemoHelper.Pause();
-
-        //        WebDriverWait wait =
-        //            new WebDriverWait(driver, TimeSpan.FromSeconds(11));
-        //        IWebElement applyLink =
-        //            wait.Until(ExpectedConditions.ElementToBeClickable(By.LinkText("Easy: Apply Now!")));
-        //        applyLink.Click();
-
-        //        DemoHelper.Pause();
-
-        //        Assert.Equal("Credit Card Application - Credit Cards", driver.Title);
-        //        Assert.Equal(ApplyUrl, driver.Url);
-        //    }
-        //}
 
         [Fact]
         public void BeInitiatedFromHomePage_CustomerService()
         {
-            using (IWebDriver driver = new ChromeDriver())
-            {
-                output.WriteLine($"{DateTime.Now.ToLongTimeString()} Navigating to '{HomeUrl}'");
-                driver.Navigate().GoToUrl(HomeUrl);
+            var homePage = new HomePage(ChromeDriverFixture.Driver);
+            homePage.NavigateTo();
 
-                output.WriteLine($"{DateTime.Now.ToLongTimeString()} Finding element using explicit wait");
-                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(35));
+            homePage.WaitForCustomerServiceCarouselPage();
 
-                IWebElement applyLink =
-                    wait.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("customer-service-apply-now")));
+            ApplicationPage applicationPage = homePage.ClickCustomerServiceApplicationLink();
 
-                output.WriteLine($"{DateTime.Now.ToLongTimeString()} Found element Displayed={applyLink.Displayed} Enabled={applyLink.Enabled}");
-                output.WriteLine($"{DateTime.Now.ToLongTimeString()} Clicking element");
-                applyLink.Click();
-
-                DemoHelper.Pause();
-
-                Assert.Equal("Credit Card Application - Credit Cards", driver.Title);
-                Assert.Equal(ApplyUrl, driver.Url);
-            }
+            applicationPage.EnsurePageLoaded();
         }
 
         [Fact]
         public void BeInitiatedFromHomePage_RandomGreeting()
         {
-            using (IWebDriver driver = new ChromeDriver())
-            {
-                driver.Navigate().GoToUrl(HomeUrl);
-                DemoHelper.Pause();
+            var homePage = new HomePage(ChromeDriverFixture.Driver);
+            homePage.NavigateTo();
 
-                IWebElement randomGreetingApplyLink =
-                    driver.FindElement(By.PartialLinkText("- Apply Now!"));
-                randomGreetingApplyLink.Click();
+            ApplicationPage applicationPage = homePage.ClickRandomGreetingApplyLink();
 
-                DemoHelper.Pause();
-
-                Assert.Equal("Credit Card Application - Credit Cards", driver.Title);
-                Assert.Equal(ApplyUrl, driver.Url);
-            }
+            applicationPage.EnsurePageLoaded();
         }
 
         [Fact]
-        public void BeInitiatedFromHomePage_RandomGreeting_Using_XPATH()
+        public void BeSubmittedWhenValid()
         {
-            using (IWebDriver driver = new ChromeDriver())
-            {
-                driver.Navigate().GoToUrl(HomeUrl);
-                DemoHelper.Pause();
+            const string FirstName = "Sarah";
+            const string LastName = "Smith";
+            const string Number = "123456-A";
+            const string Age = "18";
+            const string Income = "50000";
 
-                IWebElement randomGreetingApplyLink =
-                    driver.FindElement(By.XPath("//a[text()[contains(.,'- Apply Now!')]]"));
-                randomGreetingApplyLink.Click();
+            var applicationPage = new ApplicationPage(ChromeDriverFixture.Driver);
+            applicationPage.NavigateTo();
 
-                DemoHelper.Pause();
+            applicationPage.EnterFirstName(FirstName);
+            applicationPage.EnterLastName(LastName);
+            applicationPage.EnterFrequentFlyerNumber(Number);
+            applicationPage.EnterAge(Age);
+            applicationPage.EnterGrossAnnualIncome(Income);
+            applicationPage.ChooseMaritalStatusSingle();
+            applicationPage.ChooseBusinessSourceTV();
+            applicationPage.AcceptTerms();
+            ApplicationCompletePage applicationCompletePage =
+                applicationPage.SubmitApplication();
 
-                Assert.Equal("Credit Card Application - Credit Cards", driver.Title);
-                Assert.Equal(ApplyUrl, driver.Url);
-            }
+            applicationCompletePage.EnsurePageLoaded();
+
+            Assert.Equal("ReferredToHuman", applicationCompletePage.Decision);
+            Assert.NotEmpty(applicationCompletePage.ReferenceNumber);
+            Assert.Equal($"{FirstName} {LastName}", applicationCompletePage.FullName);
+            Assert.Equal(Age, applicationCompletePage.Age);
+            Assert.Equal(Income, applicationCompletePage.Income);
+            Assert.Equal("Single", applicationCompletePage.RelationshipStatus);
+            Assert.Equal("TV", applicationCompletePage.BusinessSource);
+        }
+
+        [Fact]
+        public void BeSubmittedWhenValidationErrorsCorrected()
+        {
+            const string firstName = "Sarah";
+            const string invalidAge = "17";
+            const string validAge = "18";
+
+            var applicationPage = new ApplicationPage(ChromeDriverFixture.Driver);
+            applicationPage.NavigateTo();
+
+            applicationPage.EnterFirstName(firstName);
+            // Don't enter lastname
+            applicationPage.EnterFrequentFlyerNumber("123456-A");
+            applicationPage.EnterAge(invalidAge);
+            applicationPage.EnterGrossAnnualIncome("50000");
+            applicationPage.ChooseMaritalStatusSingle();
+            applicationPage.ChooseBusinessSourceTV();
+            applicationPage.AcceptTerms();
+            applicationPage.SubmitApplication();
+
+            // Assert that validation failed                                
+            Assert.Equal(2, applicationPage.ValidationErrorMessages.Count);
+            Assert.Contains("Please provide a last name", applicationPage.ValidationErrorMessages);
+            Assert.Contains("You must be at least 18 years old", applicationPage.ValidationErrorMessages);
+
+            // Fix errors
+            applicationPage.EnterLastName("Smith");
+            applicationPage.ClearAge();
+            applicationPage.EnterAge(validAge);
+
+            // Resubmit form
+            ApplicationCompletePage applicationCompletePage = applicationPage.SubmitApplication();
+
+            // Check form submitted
+            applicationCompletePage.EnsurePageLoaded();
         }
     }
 }

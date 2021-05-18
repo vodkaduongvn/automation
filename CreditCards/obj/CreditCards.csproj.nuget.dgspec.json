@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\vodka\\Automation\\06\\08MultipleElements\\CreditCards\\CreditCards.csproj": {}
+    "E:\\vodka\\Automation\\study\\automation\\CreditCards\\CreditCards.csproj": {}
   },
   "projects": {
-    "E:\\vodka\\Automation\\06\\08MultipleElements\\CreditCards\\CreditCards.csproj": {
+    "E:\\vodka\\Automation\\study\\automation\\CreditCards\\CreditCards.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\vodka\\Automation\\06\\08MultipleElements\\CreditCards\\CreditCards.csproj",
+        "projectUniqueName": "E:\\vodka\\Automation\\study\\automation\\CreditCards\\CreditCards.csproj",
         "projectName": "CreditCards",
-        "projectPath": "E:\\vodka\\Automation\\06\\08MultipleElements\\CreditCards\\CreditCards.csproj",
+        "projectPath": "E:\\vodka\\Automation\\study\\automation\\CreditCards\\CreditCards.csproj",
         "packagesPath": "C:\\Users\\vodka\\.nuget\\packages\\",
-        "outputPath": "E:\\vodka\\Automation\\06\\08MultipleElements\\CreditCards\\obj\\",
+        "outputPath": "E:\\vodka\\Automation\\study\\automation\\CreditCards\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
